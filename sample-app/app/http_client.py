@@ -9,8 +9,13 @@ from __future__ import annotations
 import json
 from collections.abc import Awaitable, Callable
 
+from .rate_limit import RateLimiter
+
 #: 일시적 실패로 간주하는 상태 코드.
 TRANSIENT_STATUS = frozenset({429, 500, 502, 503, 504})
+
+#: 외부로 나가는 요청 전체에 걸리는 제한기.
+limiter = RateLimiter(capacity=20.0, refill_per_sec=5.0)
 
 #: (method, url, body) -> (status, text)
 Transport = Callable[[str, str, str], Awaitable[tuple[int, str]]]
@@ -28,6 +33,8 @@ class HttpError(Exception):
 
 
 async def post_json(transport: Transport, url: str, payload: dict) -> dict | None:
+    await limiter.acquire()
+
     status, text = await transport("POST", url, json.dumps(payload))
     if not 200 <= status < 300:
         raise HttpError(status, text)
