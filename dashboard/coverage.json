@@ -1,16 +1,28 @@
 {
   "repo": "daeungo1/the-last-human",
-  "generated_at": "2026-09-08T04:46:12+00:00",
+  "generated_at": "2026-09-08T08:08:55+00:00",
   "window_days": 30,
-  "merged_total": 0,
-  "gated_total": 0,
+  "merged_total": 1,
+  "gated_total": 1,
   "attested_total": 0,
-  "forced_total": 0,
-  "waiting_total": 3,
+  "forced_total": 1,
+  "waiting_total": 4,
   "closed_unattested": 0,
   "attested_lines": 0,
   "gated_lines": 0,
   "zones": [
+    {
+      "zone": "docs/",
+      "owner": "@daeungo1",
+      "merged": 1,
+      "gated": 1,
+      "attested": 0,
+      "forced": 1,
+      "answerers": 0,
+      "low_sample": true,
+      "rate": null,
+      "status": "0명"
+    },
     {
       "zone": "src/lasthuman/risk.py",
       "owner": "@daeungo1",
@@ -142,23 +154,11 @@
       "low_sample": false,
       "rate": null,
       "status": "위험도 낮음"
-    },
-    {
-      "zone": "docs/",
-      "owner": "@daeungo1",
-      "merged": 0,
-      "gated": 0,
-      "attested": 0,
-      "forced": 0,
-      "answerers": 0,
-      "low_sample": false,
-      "rate": null,
-      "status": "위험도 낮음"
     }
   ],
   "attestedRate": null,
   "coveredZones": 0,
-  "gatedZones": 0,
-  "thinZones": 0,
+  "gatedZones": 1,
+  "thinZones": 1,
   "minSample": 5
 }
