@@ -36,3 +36,13 @@ class OrderRepository:
             "UPDATE orders SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL",
             (deleted_at, order_id),
         )
+
+    async def purge_soft_deleted(self, retention_days: int = 90) -> None:
+        """보존 기간이 지난 소프트 삭제 주문을 물리 삭제한다.
+
+        배치에서만 호출한다.
+        """
+        await self.db.raw(
+            "DELETE FROM orders WHERE deleted_at IS NOT NULL "
+            f"AND deleted_at < NOW() - INTERVAL {retention_days} DAY"
+        )
