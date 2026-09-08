@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이해 인증 · daeungo1/the-last-human #5</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --line: #d1d9e0;
+    --card: #f6f8fa; --accent: #0969da; --warn: #9a6700; --warn-bg: #fff8c5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --line: #3d444d;
+      --card: #151b23; --accent: #4493f8; --warn: #d29922; --warn-bg: #282215;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1rem 4rem; background: var(--bg); color: var(--fg);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+          "Malgun Gothic", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+  .sub { color: var(--muted); margin: 0 0 1.5rem; font-size: .9rem; }
+  .sub a { color: var(--accent); }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-size: .85em; }
+  .risk { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; background: var(--card); margin-bottom: 1.5rem; }
+  .risk h2 { font-size: .95rem; margin: 0 0 .5rem; font-weight: 600; }
+  .score { font-size: 1.8rem; font-weight: 700; }
+  .risk ul { margin: .5rem 0 0; padding-left: 1.2rem; color: var(--muted); font-size: .88rem; }
+  .roles { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
+  .roles label {
+    flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: .7rem 1rem;
+    cursor: pointer; text-align: center;
+  }
+  .roles input { margin-right: .4rem; }
+  .roles label:has(input:checked) { border-color: var(--accent); background: var(--card); }
+  .q { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+  .q header { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
+  .tag {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .04em;
+    border: 1px solid var(--line); border-radius: 999px; padding: .1rem .5rem; color: var(--muted);
+  }
+  .anchor { margin-left: auto; }
+  .anchor a { color: var(--accent); text-decoration: none; }
+  .anchor a:hover { text-decoration: underline; }
+  .q p { margin: 0 0 .75rem; }
+  textarea {
+    width: 100%; min-height: 6.5rem; padding: .6rem; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--fg);
+    font: inherit; resize: vertical;
+  }
+  textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .choices { list-style: none; margin: 0 0 .9rem; padding: 0; display: grid; gap: .4rem; }
+  .choices label {
+    display: flex; gap: .55rem; align-items: flex-start; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 6px; padding: .55rem .7rem;
+  }
+  .choices label:has(input:checked) { border-color: var(--accent); background: var(--card); }
+  .choices input { margin-top: .25rem; flex: none; }
+  .choices span { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; }
+  .why { margin: 0 0 .4rem; font-size: .85rem; color: var(--muted); }
+  .tag.axis-structure { border-color: var(--accent); }
+  details { margin-top: .75rem; }
+  details summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
+  details pre {
+    margin: .5rem 0 0; padding: .75rem; background: var(--card); border-radius: 6px;
+    overflow-x: auto; font-size: .8rem; line-height: 1.5;
+  }
+  .note {
+    background: var(--warn-bg); border-left: 3px solid var(--warn); padding: .75rem 1rem;
+    border-radius: 0 6px 6px 0; font-size: .88rem; margin-bottom: 1.5rem;
+  }
+  .actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-top: 1.5rem; }
+  button {
+    font: inherit; font-weight: 600; padding: .6rem 1.2rem; border-radius: 6px;
+    border: 1px solid transparent; background: var(--accent); color: #fff; cursor: pointer;
+  }
+  .status { color: var(--muted); font-size: .88rem; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: .8rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>이 변경을 이해했는지 확인합니다</h1>
+  <p class="sub">
+    <a href="https://github.com/daeungo1/the-last-human/pull/5">daeungo1/the-last-human #5</a>
+    · 커밋 <code>9ee4431</code>
+  </p>
+
+  <div class="risk">
+    <h2>위험 점수 <span class="score">40</span> <span class="mono" style="color:var(--muted)">/ 임계값 40</span></h2>
+    <ul>
+      <li>변경 664줄 (+30, 상한 30)</li>
+      <li>에이전트 흔적 (+10)</li>
+    </ul>
+  </div>
+
+  <p class="note">
+    질문은 코드를 열어야만 답할 수 있게 만들어졌습니다. 그래서 해당 코드를 미리 보여주지 않습니다.
+    앵커를 눌러 실제 파일을 여십시오. 모르겠으면 모르겠다고 쓰셔도 됩니다 —
+    <strong>보류는 기록에 남지 않습니다.</strong>
+  </p>
+
+  <div class="roles">
+    <label><input type="radio" name="role" value="author" checked> 생성자로 인증</label>
+    <label><input type="radio" name="role" value="reviewer"> 리뷰어로 인증</label>
+  </div>
+
+  <form id="f">
+    <div class="q">
+      <header>
+        <span class="tag axis-code">claim</span>
+        <span class="anchor mono"><a href="https://github.com/daeungo1/the-last-human/blob/9ee443101d76ae1f82bf12c5d817714f968832e8/docs/plan-v2.html#L903" target="_blank" rel="noopener">docs/plan-v2.html:L903</a></span>
+      </header>
+      <p>[dry-run] docs/plan-v2.html:L903의 변경이 어떤 상황에서 무슨 결과를 냅니까?</p>
+      <textarea data-anchor="docs/plan-v2.html:L903" placeholder="코드를 보고 답해 주세요"></textarea>
+      <details>
+        <summary>막혔을 때 — 해당 코드 펼치기</summary>
+        <pre>   &lt;div class=&#34;part&#34;&gt;&lt;span class=&#34;n&#34;&gt;PART III&lt;/span&gt;&lt;h2&gt;어떻게 만드는가&lt;/h2&gt;&lt;span class=&#34;en&#34;&gt;Architecture&lt;/span&gt;&lt;/div&gt;
+ 
+   &lt;section id=&#34;s10&#34;&gt;
+-    &lt;div class=&#34;sec-head&#34;&gt;&lt;span class=&#34;sec-num&#34;&gt;10&lt;/span&gt;&lt;h3&gt;시스템 구성도&lt;/h3&gt;&lt;span class=&#34;aside&#34;&gt;신뢰 경계 설계&lt;/span&gt;&lt;/div&gt;
+-
+-    &lt;p&gt;확장이 면담을 진행하고 인증을 남기지만, &lt;strong&gt;Action은 그 결과를 믿지 않습니다.&lt;/strong&gt;
+-    위험 점수를 스스로 다시 계산하고 인증이 현재 커밋에 묶여 있는지 확인합니다.
+-    그래서 두 쪽이 같은 규칙을 써야 하고, 그것이 &lt;code&gt;packages/core&lt;/code&gt;가 존재하는 이유입니다.&lt;/p&gt;
++    &lt;div class=&#34;sec-head&#34;&gt;&lt;span class=&#34;sec-num&#34;&gt;10&lt;/span&gt;&lt;h3&gt;시스템 구성도&lt;/h3&gt;&lt;span class=&#34;aside&#34;&gt;2026-09-08 목표 런타임&lt;/span&gt;&lt;/div&gt;
++
++    &lt;div class=&#34;arch-update&#34; style=&#34;margin-top:0&#34;&gt;
++      &lt;span class=&#34;tag&#34;&gt;갱신&lt;/span&gt;
++      &lt;div&gt;&lt;b&gt;Bot 서비스&lt;/b&gt;가 GitHub App 신원으로 웹 면담을 열고, LLM 보조 판정을 돌리고,
++      PR 코멘트와 게이트 상태(commit status)에 대해 &lt;b&gt;유일한 쓰기 주체&lt;/b&gt;가 됩니다.
++      Actions는 &lt;code&gt;pull_request&lt;/code&gt; 이벤트만 Bot에 전달하고 &lt;b&gt;게이트를 쓰지 않습니다.&lt;/b&gt;
++      웹 브라우저는 세션을 표시할 뿐 판정을 결정하지 않고, LLM과 개인 기록 저장소는 Bot 내부 의존입니다.&lt;/div&gt;
++    &lt;/div&gt;
+ 
+     &lt;figure&gt;
+-      &lt;svg viewBox=&#34;0 0 1000 580&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; role=&#34;img&#34; aria-label=&#34;시스템 구성도&#34;&gt;
++      &lt;svg viewBox=&#34;0 0 1000 660&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; role=&#34;img&#34; aria-labelledby=&#34;s10-title s10-desc&#34;&gt;
++        &lt;title id=&#34;s10-title&#34;&gt;The Last Human 목표 런타임 시스템 구성&lt;/title&gt;
++        &lt;desc id=&#34;s10-desc&#34;&gt;Bot 서비스가 GitHub App 신원으로 PR 게이트/코멘트에 대한 유일 쓰기 주체가 되고,
++        사람은 웹 면담 UI를 통해 답하며, GitHub Actions는 이벤트만 전달하고, 대시보드는 머지된 모듈 통계만 갱신한다.
++        LLM 제공자와 개인 기록 저장소는 Bot 내부 의존이다.&lt;/desc&gt;
+         &lt;defs&gt;
+-          &lt;marker id=&#34;a1&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#15181A&#34;/&gt;&lt;/marker&gt;
+-          &lt;marker id=&#34;a1g&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#7C8177&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s10a&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#15181A&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s10b&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#1C3D63&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s10g&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#2F6B4F&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s10y&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#7C8177&#34;/&gt;&lt;/marker&gt;
+         &lt;/defs&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;36&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;로컬 · 신뢰하지 않음&lt;/text&gt;
+-        &lt;text x=&#34;670&#34; y=&#34;36&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;GitHub · 강제가 일어나는 곳&lt;/text&gt;
+-        &lt;line x1=&#34;335&#34; y1=&#34;58&#34; x2=&#34;335&#34; y2=&#34;378&#34; stroke=&#34;#A32A22&#34; stroke-width=&#34;2&#34; stroke-dasharray=&#34;7 6&#34;/&gt;
+-        &lt;text x=&#34;335&#34; y=&#34;398&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;신뢰 경계&lt;/text&gt;
+-        &lt;rect x=&#34;40&#34; y=&#34;70&#34; width=&#34;250&#34; height=&#34;58&#34; fill=&#34;#DEDFD7&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34;/&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;16&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;Copilot 모델&lt;/text&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;115&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;vscode.lm.selectChatModels&lt;/text&gt;
+-        &lt;rect x=&#34;40&#34; y=&#34;160&#34; width=&#34;250&#34; height=&#34;150&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;186&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;17&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;VS Code 확장&lt;/text&gt;
+-        &lt;rect x=&#34;56&#34; y=&#34;200&#34; width=&#34;218&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;218&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;panel.ts · 면담 UI&lt;/text&gt;
+-        &lt;rect x=&#34;56&#34; y=&#34;232&#34; width=&#34;218&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;250&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;interview.ts · 질문 · 판정&lt;/text&gt;
+-        &lt;rect x=&#34;56&#34; y=&#34;264&#34; width=&#34;218&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;165&#34; y=&#34;282&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;github.ts · 인증 기록&lt;/text&gt;
+-        &lt;rect x=&#34;380&#34; y=&#34;160&#34; width=&#34;250&#34; height=&#34;150&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;505&#34; y=&#34;186&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;17&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub 저장소&lt;/text&gt;
+-        &lt;rect x=&#34;396&#34; y=&#34;200&#34; width=&#34;218&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;505&#34; y=&#34;218&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;Pull Request · 코멘트&lt;/text&gt;
+-        &lt;rect x=&#34;396&#34; y=&#34;232&#34; width=&#34;218&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;505&#34; y=&#34;250&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;Checks · 상태 검사&lt;/text&gt;
+-        &lt;rect x=&#34;396&#34; y=&#34;264&#34; width=&#34;218&#34; height=&#34;26&#34; fill=&#34;#E4DAD8&#34; stroke=&#34;#A32A22&#34;/&gt;
+-        &lt;text x=&#34;505&#34; y=&#34;282&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;Branch protection · 필수 검사&lt;/text&gt;
+-        &lt;rect x=&#34;700&#34; y=&#34;160&#34; width=&#34;260&#34; height=&#34;150&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;830&#34; y=&#34;186&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;17&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub Action&lt;/text&gt;
+-        &lt;rect x=&#34;716&#34; y=&#34;200&#34; width=&#34;228&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;830&#34; y=&#34;218&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;위험 점수 재계산&lt;/text&gt;
+-        &lt;rect x=&#34;716&#34; y=&#34;232&#34; width=&#34;228&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;830&#34; y=&#34;250&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;인증 검증 · SHA 대조&lt;/text&gt;
+-        &lt;rect x=&#34;716&#34; y=&#34;264&#34; width=&#34;228&#34; height=&#34;26&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;830&#34; y=&#34;282&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;check 결과 보고&lt;/text&gt;
+-        &lt;line x1=&#34;165&#34; y1=&#34;128&#34; x2=&#34;165&#34; y2=&#34;156&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#a1)&#34;/&gt;
+-        &lt;text x=&#34;176&#34; y=&#34;147&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34;&gt;질문 · 판정&lt;/text&gt;
+-        &lt;line x1=&#34;292&#34; y1=&#34;230&#34; x2=&#34;376&#34; y2=&#34;230&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#a1)&#34;/&gt;
+-        &lt;text x=&#34;334&#34; y=&#34;221&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;인증 코멘트&lt;/text&gt;
+-        &lt;line x1=&#34;632&#34; y1=&#34;216&#34; x2=&#34;696&#34; y2=&#34;216&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#a1)&#34;/&gt;
+-        &lt;text x=&#34;664&#34; y=&#34;207&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;PR 이벤트&lt;/text&gt;
+-        &lt;line x1=&#34;696&#34; y1=&#34;272&#34; x2=&#34;632&#34; y2=&#34;272&#34; stroke=&#34;#A32A22&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#a1)&#34;/&gt;
+-        &lt;text x=&#34;664&#34; y=&#34;292&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;success · failure · neutral&lt;/text&gt;
+-        &lt;rect x=&#34;140&#34; y=&#34;418&#34; width=&#34;700&#34; height=&#34;118&#34; fill=&#34;#E4E5DE&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;490&#34; y=&#34;446&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;17&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;packages/core — 확장과 Action이 같은 규칙을 공유&lt;/text&gt;
+-        &lt;rect x=&#34;162&#34; y=&#34;462&#34; width=&#34;150&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;237&#34; y=&#34;484&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;diff.ts&lt;/text&gt;
+-        &lt;text x=&#34;237&#34; y=&#34;501&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;hunk · 앵커&lt;/text&gt;
+-        &lt;rect x=&#34;332&#34; y=&#34;462&#34; width=&#34;150&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;407&#34; y=&#34;484&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;risk.ts&lt;/text&gt;
+-        &lt;text x=&#34;407&#34; y=&#34;501&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;점수 · 사유&lt;/text&gt;
+-        &lt;rect x=&#34;502&#34; y=&#34;462&#34; width=&#34;150&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;577&#34; y=&#34;484&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;attest.ts&lt;/text&gt;
+-        &lt;text x=&#34;577&#34; y=&#34;501&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;형식 · 검증&lt;/text&gt;
+-        &lt;rect x=&#34;672&#34; y=&#34;462&#34; width=&#34;150&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;747&#34; y=&#34;484&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;config.ts&lt;/text&gt;
+-        &lt;text x=&#34;747&#34; y=&#34;501&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;정책 파싱&lt;/text&gt;
+-        &lt;line x1=&#34;165&#34; y1=&#34;312&#34; x2=&#34;165&#34; y2=&#34;414&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;2&#34; stroke-dasharray=&#34;5 5&#34; marker-end=&#34;url(#a1g)&#34;/&gt;
+-        &lt;line x1=&#34;830&#34; y1=&#34;312&#34; x2=&#34;830&#34; y2=&#34;414&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;2&#34; stroke-dasharray=&#34;5 5&#34; marker-end=&#34;url(#a1g)&#34;/&gt;
+-        &lt;text x=&#34;122&#34; y=&#34;368&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;import&lt;/text&gt;
+-        &lt;text x=&#34;873&#34; y=&#34;368&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;import&lt;/text&gt;
++
++        &lt;text x=&#34;150&#34; y=&#34;30&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;사람 · 브라우저 · 이벤트&lt;/text&gt;
++        &lt;text x=&#34;500&#34; y=&#34;30&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;Bot 서비스 · 유일 쓰기 주체&lt;/text&gt;
++        &lt;text x=&#34;870&#34; y=&#34;30&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#2F6B4F&#34; text-anchor=&#34;middle&#34;&gt;GitHub 강제 · 조직 기록&lt;/text&gt;
++
++        &lt;rect x=&#34;30&#34; y=&#34;60&#34; width=&#34;230&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;145&#34; y=&#34;86&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;사람 (Developer)&lt;/text&gt;
++        &lt;text x=&#34;145&#34; y=&#34;106&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;PR을 만들고 · 답하고 · 머지&lt;/text&gt;
++
++        &lt;rect x=&#34;30&#34; y=&#34;150&#34; width=&#34;230&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;145&#34; y=&#34;176&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;웹 면담 UI&lt;/text&gt;
++        &lt;text x=&#34;145&#34; y=&#34;196&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;세션 표시 · 답변 제출 (판정 아님)&lt;/text&gt;
++
++        &lt;rect x=&#34;30&#34; y=&#34;240&#34; width=&#34;230&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;145&#34; y=&#34;266&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub Actions&lt;/text&gt;
++        &lt;text x=&#34;145&#34; y=&#34;286&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;PR 이벤트 전달 · 게이트 쓰기 없음&lt;/text&gt;
++
++        &lt;rect x=&#34;310&#34; y=&#34;60&#34; width=&#34;380&#34; height=&#34;330&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2.5&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;86&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;16&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;The Last Human Bot 서비스&lt;/text&gt;
++        &lt;text x=&#34;500&#34; y=&#34;104&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;GitHub App 신원 · Python 실행 서비스&lt;/text&gt;
++
++        &lt;rect x=&#34;326&#34; y=&#34;120&#34; width=&#34;164&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++        &lt;text x=&#34;408&#34; y=&#34;141&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;이벤트 수신&lt;/text&gt;
++        &lt;text x=&#34;408&#34; y=&#34;160&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;webhook · 워크플로 콜백&lt;/text&gt;
++
++        &lt;rect x=&#34;510&#34; y=&#34;120&#34; width=&#34;164&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++        &lt;text x=&#34;592&#34; y=&#34;141&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;위험 · 대상 판정&lt;/text&gt;
++        &lt;text x=&#34;592&#34; y=&#34;160&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;결정형 · 모델 미사용&lt;/text&gt;
++
++        &lt;rect x=&#34;326&#34; y=&#34;182&#34; width=&#34;164&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++        &lt;text x=&#34;408&#34; y=&#34;203&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;세션 · 질문 관리&lt;/text&gt;
++        &lt;text x=&#34;408&#34; y=&#34;222&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;질문 버전 · 응답자 검증&lt;/text&gt;
++
++        &lt;rect x=&#34;510&#34; y=&#34;182&#34; width=&#34;164&#34; height=&#34;52&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++        &lt;text x=&#34;592&#34; y=&#34;203&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;판정 오케스트레이터&lt;/text&gt;
++        &lt;text x=&#34;592&#34; y=&#34;222&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;보조 판정 → 사람 정한 기준&lt;/text&gt;
++
++        &lt;rect x=&#34;326&#34; y=&#34;244&#34; width=&#34;164&#34; height=&#34;52&#34; fill=&#34;#F6F1E4&#34; stroke=&#34;#8A6A12&#34;/&gt;
++        &lt;text x=&#34;408&#34; y=&#34;265&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#8A6A12&#34; text-anchor=&#34;middle&#34;&gt;LLM 클라이언트&lt;/text&gt;
++        &lt;text x=&#34;408&#34; y=&#34;284&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;내부 의존 · 실패는 보류가 아님&lt;/text&gt;
++
++        &lt;rect x=&#34;510&#34; y=&#34;244&#34; width=&#34;164&#34; height=&#34;52&#34; fill=&#34;#F6F1E4&#34; stroke=&#34;#8A6A12&#34;/&gt;
++        &lt;text x=&#34;592&#34; y=&#34;265&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#8A6A12&#34; text-anchor=&#34;middle&#34;&gt;신뢰 기록 저장소&lt;/text&gt;
++        &lt;text x=&#34;592&#34; y=&#34;284&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;성공 확인 · 개정 이력 (내부)&lt;/text&gt;
++
++        &lt;rect x=&#34;326&#34; y=&#34;306&#34; width=&#34;348&#34; height=&#34;70&#34; fill=&#34;#DEDFD7&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;329&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;GitHub 클라이언트 (App 신원)&lt;/text&gt;
++        &lt;text x=&#34;500&#34; y=&#34;348&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;PR 코멘트 · 게이트 상태(commit status) · 사실 조회&lt;/text&gt;
++        &lt;text x=&#34;500&#34; y=&#34;366&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;이 게이트 상태에 대한 유일한 쓰기 주체&lt;/text&gt;
++
++        &lt;rect x=&#34;740&#34; y=&#34;60&#34; width=&#34;230&#34; height=&#34;90&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;855&#34; y=&#34;86&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub PR · 게이트&lt;/text&gt;
++        &lt;text x=&#34;855&#34; y=&#34;105&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;PR 코멘트 · commit status&lt;/text&gt;
++        &lt;rect x=&#34;756&#34; y=&#34;118&#34; width=&#34;198&#34; height=&#34;26&#34; fill=&#34;#E4DAD8&#34; stroke=&#34;#A32A22&#34;/&gt;
++        &lt;text x=&#34;855&#34; y=&#34;136&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;Branch protection · 필수 검사&lt;/text&gt;
++
++        &lt;rect x=&#34;740&#34; y=&#34;180&#34; width=&#34;230&#34; height=&#34;90&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;855&#34; y=&#34;206&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;대시보드&lt;/text&gt;
++        &lt;text x=&#34;855&#34; y=&#34;226&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;머지된 PR/모듈 커버리지 집계&lt;/text&gt;
++        &lt;text x=&#34;855&#34; y=&#34;246&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;사람 이름 없는 조직 지표&lt;/text&gt;
++        &lt;text x=&#34;855&#34; y=&#34;262&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;Azure 배포는 로컬 이후&lt;/text&gt;
++
++        &lt;line x1=&#34;145&#34; y1=&#34;120&#34; x2=&#34;145&#34; y2=&#34;146&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s10a)&#34;/&gt;
++        &lt;text x=&#34;153&#34; y=&#34;137&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34;&gt;로그인 · 답변&lt;/text&gt;
++        &lt;line x1=&#34;260&#34; y1=&#34;180&#34; x2=&#34;306&#34; y2=&#34;200&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s10a)&#34;/&gt;
++        &lt;line x1=&#34;306&#34; y1=&#34;215&#34; x2=&#34;260&#34; y2=&#34;195&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;5 4&#34; marker-end=&#34;url(#s10y)&#34;/&gt;
++
++        &lt;path d=&#34;M855,58 V44 H15 V270 H26&#34; fill=&#34;none&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;5 4&#34; marker-end=&#34;url(#s10b)&#34;/&gt;
++        &lt;line x1=&#34;260&#34; y1=&#34;270&#34; x2=&#34;306&#34; y2=&#34;270&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s10b)&#34;/&gt;
++
++        &lt;line x1=&#34;691&#34; y1=&#34;145&#34; x2=&#34;738&#34; y2=&#34;110&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#s10b)&#34;/&gt;
++        &lt;line x1=&#34;738&#34; y1=&#34;140&#34; x2=&#34;691&#34; y2=&#34;180&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;5 4&#34; marker-end=&#34;url(#s10y)&#34;/&gt;
++
++        &lt;line x1=&#34;691&#34; y1=&#34;345&#34; x2=&#34;738&#34; y2=&#34;240&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#s10g)&#34;/&gt;
++
++        &lt;rect x=&#34;30&#34; y=&#34;410&#34; width=&#34;940&#34; height=&#34;230&#34; fill=&#34;#E4E5DE&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;436&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;Bot 서비스 내부 소스 — &lt;tspan font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;13&#34;&gt;src/lasthuman/&lt;/tspan&gt; (Python 3.11+, 기존 모듈)&lt;/text&gt;
++
++        &lt;g font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34;&gt;
++          &lt;rect x=&#34;50&#34; y=&#34;456&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;120&#34; y=&#34;475&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;diff.py&lt;/text&gt;
++          &lt;text x=&#34;120&#34; y=&#34;491&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;hunk · 고정 앵커&lt;/text&gt;
++
++          &lt;rect x=&#34;200&#34; y=&#34;456&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;270&#34; y=&#34;475&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;risk.py&lt;/text&gt;
++          &lt;text x=&#34;270&#34; y=&#34;491&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;위험 점수 · 사람 소유&lt;/text&gt;
++
++          &lt;rect x=&#34;350&#34; y=&#34;456&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;420&#34; y=&#34;475&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;interview.py&lt;/text&gt;
++          &lt;text x=&#34;420&#34; y=&#34;491&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;프롬프트 · 판정 · 사람 소유&lt;/text&gt;
++
++          &lt;rect x=&#34;500&#34; y=&#34;456&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;570&#34; y=&#34;475&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;webui.py&lt;/text&gt;
++          &lt;text x=&#34;570&#34; y=&#34;491&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;면담 웹 UI&lt;/text&gt;
++
++          &lt;rect x=&#34;650&#34; y=&#34;456&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;720&#34; y=&#34;475&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;attest.py&lt;/text&gt;
++          &lt;text x=&#34;720&#34; y=&#34;491&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;인증 형식 · 사람 소유&lt;/text&gt;
++
++          &lt;rect x=&#34;800&#34; y=&#34;456&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;870&#34; y=&#34;475&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;config.py&lt;/text&gt;
++          &lt;text x=&#34;870&#34; y=&#34;491&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;.lasthuman.yml 로더&lt;/text&gt;
++
++          &lt;rect x=&#34;50&#34; y=&#34;506&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;120&#34; y=&#34;525&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;dashboard.py&lt;/text&gt;
++          &lt;text x=&#34;120&#34; y=&#34;541&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;조직 커버리지&lt;/text&gt;
++
++          &lt;rect x=&#34;200&#34; y=&#34;506&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;270&#34; y=&#34;525&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;ledger.py&lt;/text&gt;
++          &lt;text x=&#34;270&#34; y=&#34;541&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;모듈 집계 산출&lt;/text&gt;
++
++          &lt;rect x=&#34;350&#34; y=&#34;506&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;420&#34; y=&#34;525&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;models.py&lt;/text&gt;
++          &lt;text x=&#34;420&#34; y=&#34;541&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;데이터 형식&lt;/text&gt;
++
++          &lt;rect x=&#34;500&#34; y=&#34;506&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++          &lt;text x=&#34;570&#34; y=&#34;525&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;cli.py&lt;/text&gt;
++          &lt;text x=&#34;570&#34; y=&#34;541&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#4C5256&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;로컬 확인용&lt;/text&gt;
++
++          &lt;rect x=&#34;650&#34; y=&#34;506&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#F0E2E0&#34; stroke=&#34;#A32A22&#34; stroke-dasharray=&#34;4 3&#34;/&gt;
++          &lt;text x=&#34;720&#34; y=&#34;525&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34;&gt;server/ (제안)&lt;/text&gt;
++          &lt;text x=&#34;720&#34; y=&#34;541&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#A32A22&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;웹훅 · 세션 · 콜백&lt;/text&gt;
++
++          &lt;rect x=&#34;800&#34; y=&#34;506&#34; width=&#34;140&#34; height=&#34;42&#34; fill=&#34;#F0E2E0&#34; stroke=&#34;#A32A22&#34; stroke-dasharray=&#34;4 3&#34;/&gt;
++          &lt;text x=&#34;870&#34; y=&#34;525&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34;&gt;gh_app/ (제안)&lt;/text&gt;
++          &lt;text x=&#34;870&#34; y=&#34;541&#34; text-anchor=&#34;middle&#34; font-size=&#34;10.5&#34; fill=&#34;#A32A22&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34;&gt;App 인증 · 쓰기 어댑터&lt;/text&gt;
++        &lt;/g&gt;
++
++        &lt;text x=&#34;500&#34; y=&#34;580&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;
++          &lt;tspan font-weight=&#34;600&#34;&gt;사람 소유&lt;/tspan&gt;: &lt;tspan font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34;&gt;risk.py&lt;/tspan&gt; 가중치 ·
++          &lt;tspan font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34;&gt;interview.py&lt;/tspan&gt; 프롬프트 · 판정 기준 ·
++          &lt;tspan font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34;&gt;attest.py&lt;/tspan&gt; 형식.
++          정책 변경은 해당 책임자가 결정합니다.
++        &lt;/text&gt;
++        &lt;text x=&#34;500&#34; y=&#34;602&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;
++          붉은 점선 상자는 &lt;tspan font-weight=&#34;600&#34; fill=&#34;#A32A22&#34;&gt;제안 신규 경계&lt;/tspan&gt;입니다.
++          GitHub App 등록과 별개로 웹 답변을 받는 실행 서비스가 필요합니다.
++        &lt;/text&gt;
++        &lt;text x=&#34;500&#34; y=&#34;622&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;
++          초기에는 Actions에서 App 명의 댓글 발행을 확인할 수 있습니다. 최종 웹 직접 제출은 별도 연결 대상입니다.
++        &lt;/text&gt;
+       &lt;/svg&gt;
+-      &lt;figcaption&gt;&lt;b&gt;구성&lt;/b&gt; · 붉은 점선이 신뢰 경계입니다. 왼쪽에서 만든 인증을 오른쪽이 검증합니다.
+-      아래 파란 블록은 양쪽이 공유하는 코드로, 여기가 하나가 아니면 확장에서 통과한 PR이 Action에서 막히는 사고가 납니다.&lt;/figcaption&gt;
++      &lt;figcaption&gt;&lt;b&gt;구성&lt;/b&gt; · Bot은 GitHub 게이트 상태와 코멘트에 대한 &lt;b&gt;유일한 쓰기 주체&lt;/b&gt;입니다.
++      Actions는 이벤트만 전달하고 게이트에 대해 경쟁 쓰기를 하지 않습니다.
++      LLM과 신뢰 기록 저장소는 Bot 서비스의 내부 의존이며, 밖으로 별도 러너를 노출하지 않습니다.
++      파란 점선은 GitHub PR → Actions 이벤트 전달, 녹색 화살표는 머지 결과 집계입니다.
++      대시보드의 머지 결과 지표와 진행 중 PR의 대기 상태는 구분합니다.&lt;/figcaption&gt;
+     &lt;/figure&gt;
+ 
+     &lt;div class=&#34;note&#34;&gt;
+-      &lt;b&gt;구현 순서&lt;/b&gt; · core를 먼저 만들고 그 다음에 확장, 마지막에 Action입니다.
+-      순서를 바꾸면 위험 점수 로직이 이중으로 생기고, 이를 통합하는 데 추가 일정이 소요됩니다.
++      &lt;b&gt;구현 순서&lt;/b&gt; · &lt;code&gt;src/lasthuman&lt;/code&gt;의 &lt;code&gt;diff → risk → interview → webui → attest&lt;/code&gt;는 이미 존재합니다.
++      그 위에 웹 직접 제출·서버 기록·App 연동을 연결합니다. 아래 신규 경로는 단일 Python 앱 안의
++      &lt;b&gt;논리적 경계 제안&lt;/b&gt;이며, 별도 서비스 3개나 특정 프레임워크를 요구하지 않습니다.
++      로컬 흐름을 연결한 뒤 Azure에 배포하고, 전체 흐름을 완주한 후 촬영합니다.
+     &lt;/div&gt;
+ 
+     &lt;pre&gt;&lt;span class=&#34;c&#34;&gt;the-last-human/&lt;/span&gt;
+-  package.json           &lt;span class=&#34;c&#34;&gt;# workspaces: [&#34;packages/*&#34;]&lt;/span&gt;
+-  packages/
+-    core/                &lt;span class=&#34;c&#34;&gt;# 확장과 Action이 공유&lt;/span&gt;
+-      src/diff.ts        src/risk.ts        src/attest.ts      src/config.ts
+-    extension/           &lt;span class=&#34;c&#34;&gt;# VS Code 확장&lt;/span&gt;
+-      src/extension.ts   src/interview.ts   src/panel.ts       src/github.ts
+-    action/              &lt;span class=&#34;c&#34;&gt;# GitHub Action (게이트)&lt;/span&gt;
+-      src/main.ts        action.yml
+-  ledger/                &lt;span class=&#34;c&#34;&gt;# 커버리지 집계 (정적 산출)&lt;/span&gt;
+-  demo-repo/             &lt;span class=&#34;c&#34;&gt;# 시연용 (별도 저장소 권장)&lt;/span&gt;
+-  .lasthuman.yml
+-
+-&lt;span class=&#34;c&#34;&gt;# 의존성 — 이것만 씁니다&lt;/span&gt;
+-core      : parse-diff, minimatch, yaml
+-extension : @types/vscode, @octokit/rest
+-action    : @actions/core, @actions/github, esbuild&lt;/pre&gt;
++  pyproject.toml            &lt;span class=&#34;c&#34;&gt;# Python 3.11+&lt;/span&gt;
++  src/lasthuman/            &lt;span class=&#34;c&#34;&gt;# Bot 서비스 · 기존 모듈&lt;/span&gt;
++    diff.py    risk.py    interview.py    webui.py    attest.py
++    ledger.py  dashboard.py  config.py    models.py   cli.py
++    templates/                                          &lt;span class=&#34;c&#34;&gt;# 웹 UI 뷰&lt;/span&gt;
++    &lt;span class=&#34;c&#34;&gt;# --- 제안 신규 경계 (아직 없음) ---&lt;/span&gt;
++    server/                 &lt;span class=&#34;c&#34;&gt;# 웹 요청 수신 · 세션/콜백 (프레임워크 미확정)&lt;/span&gt;
++    gh_app/                 &lt;span class=&#34;c&#34;&gt;# GitHub App 인증 · PR/코멘트/게이트 쓰기 (유일 쓰기 주체)&lt;/span&gt;
++    store/                  &lt;span class=&#34;c&#34;&gt;# 신뢰 기록 저장소 · 성공 확인 · 개정 이력&lt;/span&gt;
++  .github/workflows/        &lt;span class=&#34;c&#34;&gt;# pull_request 이벤트를 Bot에 전달만 함&lt;/span&gt;
++  sample-app/               &lt;span class=&#34;c&#34;&gt;# 게이트가 판정할 샘플 워크로드&lt;/span&gt;
++  .lasthuman.yml            &lt;span class=&#34;c&#34;&gt;# 게이트 위험도 설정&lt;/span&gt;
++
++&lt;span class=&#34;c&#34;&gt;# 사람 소유 (에이전트에게 위임하지 않음)&lt;/span&gt;
++risk.py 가중치 · interview.py 프롬프트 · pass/hold 기준 · attest.py 형식&lt;/pre&gt;
+   &lt;/section&gt;
+ 
+   &lt;section id=&#34;s11&#34;&gt;
+-    &lt;div class=&#34;sec-head&#34;&gt;&lt;span class=&#34;sec-num&#34;&gt;11&lt;/span&gt;&lt;h3&gt;런타임 흐름&lt;/h3&gt;&lt;span class=&#34;aside&#34;&gt;15단계 · 분기 1개&lt;/span&gt;&lt;/div&gt;
+-
+-    &lt;p&gt;4번 단계가 설계 원칙이 코드로 나타나는 지점입니다.
+-    위험도가 임계값 아래면 중립으로 보고하고 끝냅니다.
+-    필수 검사는 성공뿐 아니라 중립도 통과시키기 때문에 조용히 지나갑니다.&lt;/p&gt;
++    &lt;div class=&#34;sec-head&#34;&gt;&lt;span class=&#34;sec-num&#34;&gt;11&lt;/span&gt;&lt;h3&gt;런타임 흐름&lt;/h3&gt;&lt;span class=&#34;aside&#34;&gt;2026-09-08 목표 · 6 액터 · 18 단계&lt;/span&gt;&lt;/div&gt;
++
++    &lt;div class=&#34;arch-update&#34; style=&#34;margin-top:0&#34;&gt;
++      &lt;span class=&#34;tag&#34;&gt;갱신&lt;/span&gt;
++      &lt;div&gt;액터는 &lt;b&gt;사람 · 웹 면담 UI · GitHub PR/게이트 · GitHub Actions · Bot 서비스 · 대시보드&lt;/b&gt;의 6개입니다.
++      Bot이 &lt;b&gt;단일 쓰기 주체&lt;/b&gt;로 사실 조회, LLM 보조 판정, 게이트/코멘트 갱신을 담당합니다.
++      Actions는 이벤트 전달만 하고, 웹 UI는 세션을 표시할 뿐 판정을 결정하지 않습니다.
++      LLM과 기록 저장소는 Bot 내부 의존입니다. 기본은 &lt;b&gt;유효한 1인 확인&lt;/b&gt;(작성자 우선, CODEOWNERS 대안)과
++      &lt;b&gt;설정 가능한 3문항&lt;/b&gt;입니다. Actions는 사람의 답변을 기다리며 러너를 점유하지 않습니다.&lt;/div&gt;
++    &lt;/div&gt;
+ 
+-    &lt;figure&gt;
+-      &lt;svg viewBox=&#34;0 0 1000 650&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; role=&#34;img&#34; aria-label=&#34;런타임 시퀀스&#34;&gt;
++    &lt;div style=&#34;overflow-x:auto;-webkit-overflow-scrolling:touch&#34;&gt;
++    &lt;figure style=&#34;min-width:960px&#34;&gt;
++      &lt;svg viewBox=&#34;0 0 1000 1310&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; role=&#34;img&#34; aria-labelledby=&#34;s11-title s11-desc&#34;&gt;
++        &lt;title id=&#34;s11-title&#34;&gt;런타임 흐름 · 6 액터 · 18 단계&lt;/title&gt;
++        &lt;desc id=&#34;s11-desc&#34;&gt;사람이 PR을 만들면 Actions가 Bot에 이벤트를 전달하고, Bot이 GitHub PR/게이트에 대해 유일 쓰기 주체로
++        pending 게이트를 걸고, 웹 면담 UI를 통해 답변을 받고, LLM 보조로 판정을 반복하며, 통과 시 해당 SHA에
++        success 게이트와 새 완료 코멘트를 남기고, 사람이 다른 규칙을 함께 충족했을 때만 머지하고,
++        머지 뒤 Bot이 대시보드 조직 통계를 갱신한다. 대상이 아닌 경우 인증 발급 없이 success + &#39;확인 대상 아님&#39;으로 지나간다.&lt;/desc&gt;
+         &lt;defs&gt;
+-          &lt;marker id=&#34;a2&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#15181A&#34;/&gt;&lt;/marker&gt;
+-          &lt;marker id=&#34;a2r&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#A32A22&#34;/&gt;&lt;/marker&gt;
+-          &lt;marker id=&#34;a2g&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#2F6B4F&#34;/&gt;&lt;/marker&gt;
+-          &lt;marker id=&#34;a2y&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#7C8177&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s11a&#34;  markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#15181A&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s11ar&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#A32A22&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s11ab&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#1C3D63&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s11ag&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#2F6B4F&#34;/&gt;&lt;/marker&gt;
++          &lt;marker id=&#34;s11ay&#34; markerWidth=&#34;9&#34; markerHeight=&#34;9&#34; refX=&#34;8&#34; refY=&#34;4.5&#34; orient=&#34;auto&#34;&gt;&lt;path d=&#34;M0,0 L9,4.5 L0,9 z&#34; fill=&#34;#7C8177&#34;/&gt;&lt;/marker&gt;
++          &lt;style&gt;
++            #s11 .lbl{font-family:&#34;IBM Plex Sans KR&#34;,sans-serif;font-size:13px;fill:#15181A;paint-order:stroke fill;stroke:#EBECE5;stroke-width:3px}
++            #s11 .lblg{font-family:&#34;IBM Plex Sans KR&#34;,sans-serif;font-size:13px;fill:#4C5256;paint-order:stroke fill;stroke:#EBECE5;stroke-width:3px}
++            #s11 .lblr{font-family:&#34;IBM Plex Sans KR&#34;,sans-serif;font-size:13px;font-weight:600;fill:#A32A22;paint-order:stroke fill;stroke:#EBECE5;stroke-width:3px}
++            #s11 .lblb{font-family:&#34;IBM Plex Sans KR&#34;,sans-serif;font-size:13px;font-weight:600;fill:#1C3D63;paint-order:stroke fill;stroke:#EBECE5;stroke-width:3px}
++            #s11 .lblgn{font-family:&#34;IBM Plex Sans KR&#34;,sans-serif;font-size:13px;font-weight:600;fill:#2F6B4F;paint-order:stroke fill;stroke:#EBECE5;stroke-width:3px}
++            #s11 .num{font-family:&#34;Oswald&#34;,sans-serif;font-size:12px;font-weight:600;fill:#A32A22;paint-order:stroke fill;stroke:#EBECE5;stroke-width:3px}
++          &lt;/style&gt;
+         &lt;/defs&gt;
+-        &lt;rect x=&#34;30&#34; y=&#34;18&#34; width=&#34;150&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;105&#34; y=&#34;44&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;개발자&lt;/text&gt;
+-        &lt;rect x=&#34;215&#34; y=&#34;18&#34; width=&#34;160&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;295&#34; y=&#34;44&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;VS Code 확장&lt;/text&gt;
+-        &lt;rect x=&#34;410&#34; y=&#34;18&#34; width=&#34;150&#34; height=&#34;42&#34; fill=&#34;#DEDFD7&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34;/&gt;
+-        &lt;text x=&#34;485&#34; y=&#34;44&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;Copilot 모델&lt;/text&gt;
+-        &lt;rect x=&#34;595&#34; y=&#34;18&#34; width=&#34;150&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;670&#34; y=&#34;44&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub PR&lt;/text&gt;
+-        &lt;rect x=&#34;785&#34; y=&#34;18&#34; width=&#34;180&#34; height=&#34;42&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;text x=&#34;875&#34; y=&#34;44&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;Action 게이트&lt;/text&gt;
+-        &lt;line x1=&#34;105&#34; y1=&#34;60&#34; x2=&#34;105&#34; y2=&#34;620&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
+-        &lt;line x1=&#34;295&#34; y1=&#34;60&#34; x2=&#34;295&#34; y2=&#34;620&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
+-        &lt;line x1=&#34;485&#34; y1=&#34;60&#34; x2=&#34;485&#34; y2=&#34;620&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
+-        &lt;line x1=&#34;670&#34; y1=&#34;60&#34; x2=&#34;670&#34; y2=&#34;620&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
+-        &lt;line x1=&#34;875&#34; y1=&#34;60&#34; x2=&#34;875&#34; y2=&#34;620&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
+-        &lt;line x1=&#34;105&#34; y1=&#34;96&#34; x2=&#34;664&#34; y2=&#34;96&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;385&#34; y=&#34;88&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;1 · 에이전트가 만든 PR 생성&lt;/text&gt;
+-        &lt;line x1=&#34;670&#34; y1=&#34;130&#34; x2=&#34;869&#34; y2=&#34;130&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;770&#34; y=&#34;122&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;2 · pull_request 이벤트&lt;/text&gt;
+-        &lt;path d=&#34;M875,152 L945,152 L945,178 L881,178&#34; fill=&#34;none&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;866&#34; y=&#34;200&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;end&#34;&gt;3 · 위험 점수 계산 (규칙 기반, 모델 미사용)&lt;/text&gt;
+-        &lt;line x1=&#34;869&#34; y1=&#34;228&#34; x2=&#34;676&#34; y2=&#34;228&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;1.8&#34; stroke-dasharray=&#34;6 5&#34; marker-end=&#34;url(#a2y)&#34;/&gt;
+-        &lt;text x=&#34;772&#34; y=&#34;220&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;4 · 임계값 미달 → neutral, 여기서 종료&lt;/text&gt;
+-        &lt;line x1=&#34;869&#34; y1=&#34;266&#34; x2=&#34;676&#34; y2=&#34;266&#34; stroke=&#34;#A32A22&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#a2r)&#34;/&gt;
+-        &lt;text x=&#34;772&#34; y=&#34;258&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;5 · 임계값 이상 → failure, 머지 잠김&lt;/text&gt;
+-        &lt;line x1=&#34;105&#34; y1=&#34;304&#34; x2=&#34;289&#34; y2=&#34;304&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;197&#34; y=&#34;296&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;6 · 면담 시작 명령&lt;/text&gt;
+-        &lt;line x1=&#34;295&#34; y1=&#34;338&#34; x2=&#34;479&#34; y2=&#34;338&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;387&#34; y=&#34;330&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;7 · 위험 hunk + PR 설명&lt;/text&gt;
+-        &lt;line x1=&#34;485&#34; y1=&#34;372&#34; x2=&#34;301&#34; y2=&#34;372&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;387&#34; y=&#34;364&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;8 · 질문 2~3개 (JSON)&lt;/text&gt;
+-        &lt;line x1=&#34;295&#34; y1=&#34;406&#34; x2=&#34;111&#34; y2=&#34;406&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;203&#34; y=&#34;398&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;9 · 질문 제시&lt;/text&gt;
+-        &lt;line x1=&#34;105&#34; y1=&#34;440&#34; x2=&#34;289&#34; y2=&#34;440&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;197&#34; y=&#34;432&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;10 · 사람이 답한다&lt;/text&gt;
+-        &lt;line x1=&#34;295&#34; y1=&#34;474&#34; x2=&#34;479&#34; y2=&#34;474&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;387&#34; y=&#34;466&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;11 · 판정 요청&lt;/text&gt;
+-        &lt;line x1=&#34;485&#34; y1=&#34;508&#34; x2=&#34;301&#34; y2=&#34;508&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;387&#34; y=&#34;500&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;12 · 통과 또는 보류&lt;/text&gt;
+-        &lt;line x1=&#34;295&#34; y1=&#34;542&#34; x2=&#34;664&#34; y2=&#34;542&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;480&#34; y=&#34;534&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;13 · 인증 코멘트 (headSha 바인딩)&lt;/text&gt;
+-        &lt;line x1=&#34;670&#34; y1=&#34;576&#34; x2=&#34;869&#34; y2=&#34;576&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#a2)&#34;/&gt;
+-        &lt;text x=&#34;770&#34; y=&#34;568&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;14 · 재실행 · 인증 검증&lt;/text&gt;
+-        &lt;line x1=&#34;869&#34; y1=&#34;610&#34; x2=&#34;676&#34; y2=&#34;610&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#a2g)&#34;/&gt;
+-        &lt;text x=&#34;772&#34; y=&#34;602&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; font-weight=&#34;600&#34; fill=&#34;#2F6B4F&#34; text-anchor=&#34;middle&#34;&gt;15 · success · 머지 버튼 열림&lt;/text&gt;
++
++        &lt;!-- actor headers --&gt;
++        &lt;g&gt;
++          &lt;rect x=&#34;27.5&#34;  y=&#34;15&#34; width=&#34;145&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++          &lt;text x=&#34;100&#34; y=&#34;42&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;사람&lt;/text&gt;
++          &lt;text x=&#34;100&#34; y=&#34;62&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;Developer&lt;/text&gt;
++
++          &lt;rect x=&#34;187.5&#34; y=&#34;15&#34; width=&#34;145&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++          &lt;text x=&#34;260&#34; y=&#34;42&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;웹 면담 UI&lt;/text&gt;
++          &lt;text x=&#34;260&#34; y=&#34;62&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;Browser · 세션 표시&lt;/text&gt;
++
++          &lt;rect x=&#34;347.5&#34; y=&#34;15&#34; width=&#34;145&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++          &lt;text x=&#34;420&#34; y=&#34;42&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub PR · 게이트&lt;/text&gt;
++          &lt;text x=&#34;420&#34; y=&#34;62&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;코멘트 · commit status&lt;/text&gt;
++
++          &lt;rect x=&#34;507.5&#34; y=&#34;15&#34; width=&#34;145&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++          &lt;text x=&#34;580&#34; y=&#34;42&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;GitHub Actions&lt;/text&gt;
++          &lt;text x=&#34;580&#34; y=&#34;62&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;이벤트 라우팅 · 쓰기 없음&lt;/text&gt;
++
++          &lt;rect x=&#34;667.5&#34; y=&#34;15&#34; width=&#34;145&#34; height=&#34;60&#34; fill=&#34;#E4E5DE&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2.5&#34;/&gt;
++          &lt;text x=&#34;740&#34; y=&#34;42&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;Bot 서비스&lt;/text&gt;
++          &lt;text x=&#34;740&#34; y=&#34;62&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#1C3D63&#34; text-anchor=&#34;middle&#34;&gt;GitHub App · 유일 쓰기 주체&lt;/text&gt;
++
++          &lt;rect x=&#34;827.5&#34; y=&#34;15&#34; width=&#34;145&#34; height=&#34;60&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2&#34;/&gt;
++          &lt;text x=&#34;900&#34; y=&#34;42&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;13.5&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;대시보드&lt;/text&gt;
++          &lt;text x=&#34;900&#34; y=&#34;62&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;조직 커버리지&lt;/text&gt;
++        &lt;/g&gt;
++
++        &lt;!-- lifelines --&gt;
++        &lt;line x1=&#34;100&#34; y1=&#34;75&#34; x2=&#34;100&#34; y2=&#34;1275&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.4&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
++        &lt;line x1=&#34;260&#34; y1=&#34;75&#34; x2=&#34;260&#34; y2=&#34;1275&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.4&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
++        &lt;line x1=&#34;420&#34; y1=&#34;75&#34; x2=&#34;420&#34; y2=&#34;1275&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.4&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
++        &lt;line x1=&#34;580&#34; y1=&#34;75&#34; x2=&#34;580&#34; y2=&#34;1275&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.4&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
++        &lt;line x1=&#34;740&#34; y1=&#34;75&#34; x2=&#34;740&#34; y2=&#34;1275&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;1.6&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
++        &lt;line x1=&#34;900&#34; y1=&#34;75&#34; x2=&#34;900&#34; y2=&#34;1275&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;1.4&#34; stroke-dasharray=&#34;4 5&#34;/&gt;
++
++        &lt;!-- 1: Human -&gt; PR --&gt;
++        &lt;line x1=&#34;105&#34; y1=&#34;110&#34; x2=&#34;414&#34; y2=&#34;110&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;260&#34; y=&#34;102&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;1&lt;/tspan&gt;  PR 생성 · 재푸시&lt;/text&gt;
++
++        &lt;!-- 2: PR -&gt; Actions --&gt;
++        &lt;line x1=&#34;425&#34; y1=&#34;145&#34; x2=&#34;574&#34; y2=&#34;145&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;137&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;2&lt;/tspan&gt;  pull_request 이벤트&lt;/text&gt;
++
++        &lt;!-- 3: Actions -&gt; Bot --&gt;
++        &lt;line x1=&#34;585&#34; y1=&#34;180&#34; x2=&#34;734&#34; y2=&#34;180&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;660&#34; y=&#34;172&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;3&lt;/tspan&gt;  PR · SHA 전달&lt;/text&gt;
++
++        &lt;!-- 4a: Bot -&gt; PR (fetch) --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;215&#34; x2=&#34;425&#34; y2=&#34;215&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;207&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;4a&lt;/tspan&gt;  diff · 본문 · 사실 조회&lt;/text&gt;
++
++        &lt;!-- 4b: PR -&gt; Bot --&gt;
++        &lt;line x1=&#34;425&#34; y1=&#34;248&#34; x2=&#34;734&#34; y2=&#34;248&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;240&#34; text-anchor=&#34;middle&#34; class=&#34;lblg&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;4b&lt;/tspan&gt;  사실 응답 → Bot 결정형 위험/대상 판정&lt;/text&gt;
++
++        &lt;!-- 5: Bot -&gt; PR pending gate --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;288&#34; x2=&#34;425&#34; y2=&#34;288&#34; stroke=&#34;#1C3D63&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#s11ab)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;280&#34; text-anchor=&#34;middle&#34; class=&#34;lblb&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;5&lt;/tspan&gt;  대상: 게이트 pending 등록 (해당 SHA)&lt;/text&gt;
++
++        &lt;!-- 6: Bot self-note question set prep --&gt;
++        &lt;rect x=&#34;748&#34; y=&#34;315&#34; width=&#34;220&#34; height=&#34;42&#34; fill=&#34;#F6F1E4&#34; stroke=&#34;#8A6A12&#34;/&gt;
++        &lt;text x=&#34;858&#34; y=&#34;333&#34; text-anchor=&#34;middle&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#8A6A12&#34;&gt;&lt;tspan class=&#34;num&#34; style=&#34;fill:#8A6A12&#34;&gt;6&lt;/tspan&gt;  질문 준비 (LLM)&lt;/text&gt;
++        &lt;text x=&#34;858&#34; y=&#34;350&#34; text-anchor=&#34;middle&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#4C5256&#34;&gt;질문 3개 · 버전 고정 · 세션 준비&lt;/text&gt;
++
++        &lt;!-- 7: Bot -&gt; Web --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;385&#34; x2=&#34;265&#34; y2=&#34;385&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;377&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;7&lt;/tspan&gt;  해당 커밋의 질문 · 면담 세션 제공&lt;/text&gt;
++
++        &lt;!-- 8: Bot -&gt; PR new comment interview link --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;420&#34; x2=&#34;425&#34; y2=&#34;420&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;412&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;8&lt;/tspan&gt;  새 댓글 · 면담 시작 링크&lt;/text&gt;
++
++        &lt;!-- 9: Human -&gt; Web --&gt;
++        &lt;line x1=&#34;105&#34; y1=&#34;458&#34; x2=&#34;254&#34; y2=&#34;458&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;180&#34; y=&#34;450&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;9&lt;/tspan&gt;  로그인 · 답변&lt;/text&gt;
++
++        &lt;!-- 10: Web -&gt; Bot --&gt;
++        &lt;line x1=&#34;265&#34; y1=&#34;495&#34; x2=&#34;734&#34; y2=&#34;495&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;487&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;10&lt;/tspan&gt;  제출 → 서버가 신원 · 대상 · SHA · 질문 버전 검증&lt;/text&gt;
++
++        &lt;!-- 11 Bot self-note LLM eval --&gt;
++        &lt;rect x=&#34;748&#34; y=&#34;518&#34; width=&#34;220&#34; height=&#34;42&#34; fill=&#34;#F6F1E4&#34; stroke=&#34;#8A6A12&#34;/&gt;
++        &lt;text x=&#34;858&#34; y=&#34;536&#34; text-anchor=&#34;middle&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#8A6A12&#34;&gt;&lt;tspan class=&#34;num&#34; style=&#34;fill:#8A6A12&#34;&gt;11&lt;/tspan&gt;  Bot 내부&lt;/text&gt;
++        &lt;text x=&#34;858&#34; y=&#34;553&#34; text-anchor=&#34;middle&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34;&gt;LLM 보조 판정 (기준은 사람 소유)&lt;/text&gt;
++
++        &lt;!-- hold loop container --&gt;
++        &lt;rect x=&#34;60&#34; y=&#34;580&#34; width=&#34;880&#34; height=&#34;205&#34; fill=&#34;none&#34; stroke=&#34;#A32A22&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;7 5&#34; rx=&#34;4&#34;/&gt;
++        &lt;text x=&#34;76&#34; y=&#34;600&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34;&gt;판정 보류 루프 · 게이트 pending 유지 · 추가 근거가 필요할 때만&lt;/text&gt;
++
++        &lt;!-- 11a Bot -&gt; Web private hint --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;628&#34; x2=&#34;265&#34; y2=&#34;628&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;1.7&#34; stroke-dasharray=&#34;5 4&#34; marker-end=&#34;url(#s11ay)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;620&#34; text-anchor=&#34;middle&#34; class=&#34;lblg&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;11a&lt;/tspan&gt;  개인 힌트 (비공개 · 브라우저 세션에만)&lt;/text&gt;
++
++        &lt;!-- 11b Bot -&gt; PR continuation comment --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;663&#34; x2=&#34;425&#34; y2=&#34;663&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;655&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;11b&lt;/tspan&gt;  새 댓글 · 면담 이어가기 링크&lt;/text&gt;
++
++        &lt;!-- 11c Human -&gt; Web resubmit --&gt;
++        &lt;line x1=&#34;105&#34; y1=&#34;698&#34; x2=&#34;254&#34; y2=&#34;698&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;180&#34; y=&#34;690&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;11c&lt;/tspan&gt;  재답변&lt;/text&gt;
++
++        &lt;!-- 11d Web -&gt; Bot --&gt;
++        &lt;line x1=&#34;265&#34; y1=&#34;733&#34; x2=&#34;734&#34; y2=&#34;733&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;725&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;11d&lt;/tspan&gt;  재제출 → 10~11단계 반복&lt;/text&gt;
++
++        &lt;text x=&#34;76&#34; y=&#34;770&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11&#34; fill=&#34;#A32A22&#34;&gt;게이트 상태는 이 루프 동안 계속 pending. 성공 시 12단계로 진입.&lt;/text&gt;
++
++        &lt;!-- 12 Bot self-note: re-fetch head + persist trusted record before writes --&gt;
++        &lt;rect x=&#34;60&#34; y=&#34;792&#34; width=&#34;920&#34; height=&#34;186&#34; fill=&#34;none&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;1.5&#34; rx=&#34;4&#34;/&gt;
++        &lt;text x=&#34;76&#34; y=&#34;818&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;13&#34; font-weight=&#34;600&#34; fill=&#34;#2F6B4F&#34;&gt;확인 조건 충족 · 현재 리비전 확인&lt;/text&gt;
++        &lt;rect x=&#34;620&#34; y=&#34;806&#34; width=&#34;348&#34; height=&#34;60&#34; fill=&#34;#F6F1E4&#34; stroke=&#34;#8A6A12&#34;/&gt;
++        &lt;text x=&#34;794&#34; y=&#34;820&#34; text-anchor=&#34;middle&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;12&#34; font-weight=&#34;600&#34; fill=&#34;#8A6A12&#34;&gt;&lt;tspan class=&#34;num&#34; style=&#34;fill:#8A6A12&#34;&gt;12&lt;/tspan&gt;  Bot 내부&lt;/text&gt;
++        &lt;text x=&#34;794&#34; y=&#34;840&#34; text-anchor=&#34;middle&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#4C5256&#34;&gt;최신 head 재조회 · 사람이 정한 기준 적용&lt;/text&gt;
++        &lt;text x=&#34;794&#34; y=&#34;860&#34; text-anchor=&#34;middle&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#4C5256&#34;&gt;성공 확인 기록 저장 (GitHub 쓰기 이전)&lt;/text&gt;
++
++        &lt;!-- 13 Bot -&gt; PR success gate --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;890&#34; x2=&#34;425&#34; y2=&#34;890&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;2.2&#34; marker-end=&#34;url(#s11ag)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;882&#34; text-anchor=&#34;middle&#34; class=&#34;lblgn&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;13&lt;/tspan&gt;  해당 SHA의 gate = success&lt;/text&gt;
++
++        &lt;!-- 14 Bot -&gt; PR new completion comment --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;925&#34; x2=&#34;425&#34; y2=&#34;925&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;580&#34; y=&#34;917&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;14&lt;/tspan&gt;  새 댓글 · 완료 요약과 기록 링크&lt;/text&gt;
++
++        &lt;!-- 15 Bot -&gt; Web result/sync --&gt;
++        &lt;line x1=&#34;734&#34; y1=&#34;960&#34; x2=&#34;265&#34; y2=&#34;960&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;952&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;15&lt;/tspan&gt;  확인 결과 · GitHub 반영 상태&lt;/text&gt;
++
++        &lt;!-- 16 Human -&gt; PR merge (only if other rules satisfied) --&gt;
++        &lt;line x1=&#34;105&#34; y1=&#34;998&#34; x2=&#34;414&#34; y2=&#34;998&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;260&#34; y=&#34;990&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;16&lt;/tspan&gt;  다른 CI · 리뷰 조건 충족 후 Merge&lt;/text&gt;
++
++        &lt;!-- 17a PR -&gt; Actions --&gt;
++        &lt;line x1=&#34;425&#34; y1=&#34;1035&#34; x2=&#34;574&#34; y2=&#34;1035&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;1027&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;17a&lt;/tspan&gt;  PR closed 이벤트&lt;/text&gt;
++
++        &lt;!-- 17b Actions -&gt; Bot --&gt;
++        &lt;line x1=&#34;585&#34; y1=&#34;1068&#34; x2=&#34;734&#34; y2=&#34;1068&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;1.8&#34; marker-end=&#34;url(#s11a)&#34;/&gt;
++        &lt;text x=&#34;660&#34; y=&#34;1060&#34; text-anchor=&#34;middle&#34; class=&#34;lbl&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;17b&lt;/tspan&gt;  Merge 사실 전달&lt;/text&gt;
++
++        &lt;!-- 18 Bot -&gt; Dashboard --&gt;
++        &lt;line x1=&#34;745&#34; y1=&#34;1103&#34; x2=&#34;894&#34; y2=&#34;1103&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;2&#34; marker-end=&#34;url(#s11ag)&#34;/&gt;
++        &lt;text x=&#34;820&#34; y=&#34;1095&#34; text-anchor=&#34;middle&#34; class=&#34;lblgn&#34;&gt;&lt;tspan class=&#34;num&#34;&gt;18&lt;/tspan&gt;  Merge 집계 갱신&lt;/text&gt;
++
++        &lt;!-- Human &lt;-&gt; Dashboard drill-down --&gt;
++        &lt;line x1=&#34;105&#34; y1=&#34;1138&#34; x2=&#34;894&#34; y2=&#34;1138&#34; stroke=&#34;#7C8177&#34; stroke-width=&#34;1.5&#34; stroke-dasharray=&#34;5 4&#34; marker-end=&#34;url(#s11ay)&#34;/&gt;
++        &lt;text x=&#34;500&#34; y=&#34;1130&#34; text-anchor=&#34;middle&#34; class=&#34;lblg&#34;&gt;사람: 조회 · PR/근거로 드릴다운 (개인 순위 없음)&lt;/text&gt;
++
++        &lt;!-- not eligible branch note --&gt;
++        &lt;rect x=&#34;60&#34; y=&#34;1170&#34; width=&#34;880&#34; height=&#34;100&#34; fill=&#34;#DEDFD7&#34; stroke=&#34;#4C5256&#34; stroke-width=&#34;1.5&#34; rx=&#34;3&#34;/&gt;
++        &lt;text x=&#34;76&#34; y=&#34;1192&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;12.5&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34;&gt;확인 대상 아님 분기 (4b 이후 결정)&lt;/text&gt;
++        &lt;text x=&#34;76&#34; y=&#34;1213&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34;&gt;· 5단계 대체: Bot이 게이트 success + &#34;확인 대상 아님&#34; 태그를 씀. LLM · 면담 실행 없음. 성공 확인 기록도 발급하지 않음.&lt;/text&gt;
++        &lt;text x=&#34;76&#34; y=&#34;1232&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34;&gt;· commit status에는 neutral이 없어 success로 표기하되 코멘트에서 &#34;대상 아님&#34;을 명시. Checks API 결론과 동치가 아님.&lt;/text&gt;
++        &lt;text x=&#34;76&#34; y=&#34;1251&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#15181A&#34;&gt;· 새 커밋은 2단계 이벤트부터 다시 진행. 이전 기록은 보존되지만 새 SHA의 통과 근거로 재사용하지 않음.&lt;/text&gt;
+       &lt;/svg&gt;
+-      &lt;figcaption&gt;&lt;b&gt;핵심&lt;/b&gt; · 10번. 다른 AI 리뷰 제품은 전부 모델이 사람에게 말하는 방향인데,
+-      이 흐름에서는 &lt;b&gt;사람이 모델에게 답합니다.&lt;/b&gt; 화살표 방향 하나가 제품의 차별점입니다.&lt;/figcaption&gt;
++      &lt;figcaption&gt;&lt;b&gt;핵심&lt;/b&gt; · Bot이 게이트 상태와 코멘트에 대한 &lt;b&gt;유일한 쓰기 주체&lt;/b&gt;이고, Actions는 이벤트만 전달합니다.
++      사람이 남기는 것은 &lt;b&gt;이 SHA에서 코드에 근거해 어떤 질문에 어떻게 답했는지의 흔적&lt;/b&gt;이며, 완전한 이해나 코드 안전의 증명이 아닙니다.
++      모델/네트워크 오류는 사람의 보류로 집계하지 않고 오류·재시도 경로를 알립니다.
++      보완 안내 댓글은 공개되지만, 답변 원문과 개인 힌트는 권한이 있는 면담 화면에서만 제공합니다.&lt;/figcaption&gt;
+     &lt;/figure&gt;
++    &lt;/div&gt;
++    &lt;div class=&#34;note&#34;&gt;
++      &lt;b&gt;처리 경계&lt;/b&gt; · 17단계에서는 GitHub의 실제 &lt;code&gt;merged=true&lt;/code&gt;와 머지 시점의 검토 head를 확인합니다.
++      같은 PR을 여러 번 집계하지 않고, 질문하지 않은 파일까지 확인 범위로 확장하지 않습니다.
++      동일 제출·이벤트의 재전송으로 댓글이나 기록을 중복 생성하지 않으며, 봇의 자기 댓글은 새 면담을 시작시키지 않습니다.
++      기록 저장 후 GitHub 반영만 실패하면 동기화만 재시도합니다. 보류 작업 상태는 임시 보관하고 성공 기록만 원장에 남깁니다.
++    &lt;/div&gt;
+   &lt;/section&gt;
+ 
+   &lt;section id=&#34;s12&#34;&gt;
+-    &lt;div class=&#34;sec-head&#34;&gt;&lt;span class=&#34;sec-num&#34;&gt;12&lt;/span&gt;&lt;h3&gt;인증의 수명&lt;/h3&gt;&lt;span class=&#34;aside&#34;&gt;커밋 단위 무효화&lt;/span&gt;&lt;/div&gt;
++    &lt;div class=&#34;sec-head&#34;&gt;&lt;span class=&#34;sec-num&#34;&gt;12&lt;/span&gt;&lt;h3&gt;인증의 수명&lt;/h3&gt;&lt;span class=&#34;aside&#34;&gt;현재 적용성 vs 과거 이력&lt;/span&gt;&lt;/div&gt;
+ 
+-    &lt;p&gt;인증은 PR이 아니라 &lt;strong&gt;커밋 하나에 묶입니다.&lt;/strong&gt;
+-    새 커밋이 올라오면 자동으로 무효가 되고 다시 면담해야 합니다.
+-    리뷰 승인이 새 커밋에 의해 무효화되는 기존 동작과 같은 원리라 개발자에게 따로 설명할 필요가 없습니다.&lt;/p&gt;
++    &lt;p&gt;성공 확인 기록은 특정 &lt;strong&gt;커밋 SHA와 질문 버전&lt;/strong&gt;에 묶입니다.
++    새 커밋이 와도 과거 기록은 &lt;strong&gt;삭제되지 않지만&lt;/strong&gt;, &lt;b&gt;새 리비전의 통과 근거&lt;/b&gt;로는 사용할 수 없습니다.
++    새 SHA에 대해서는 세션과 대상 판정이 처음부터 다시 시작되고, 이전 기록은 이력으로만 남습니다.
++    또한 리뷰 시점의 head와 실제 머지 결과 SHA는 다를 수 있어(squash · rebase),
++    Bot은 &lt;strong&gt;같은 값으로 취급하지 않고 매핑을 남깁니다.&lt;/strong&gt;&lt;/p&gt;
+ 
+     &lt;figure&gt;
+-      &lt;svg viewBox=&#34;0 0 1000 260&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; role=&#34;img&#34; aria-label=&#34;인증 수명&#34;&gt;
++      &lt;svg viewBox=&#34;0 0 1000 320&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; role=&#34;img&#34; aria-labelledby=&#34;s12-title s12-desc&#34;&gt;
++        &lt;title id=&#34;s12-title&#34;&gt;인증의 수명 · 현재 적용성 vs 이력&lt;/title&gt;
++        &lt;desc id=&#34;s12-desc&#34;&gt;커밋 A에서 발급된 성공 확인 기록은 현재 적용성을 갖고 게이트를 통과시키며, 커밋 B가 푸시되면
++        기록은 이력으로 남고 새 SHA에는 무효다. 머지 시점의 결과 SHA와 리뷰 시점의 head SHA는 매핑으로만 연결한다.&lt;/desc&gt;
+         &lt;line x1=&#34;70&#34; y1=&#34;130&#34; x2=&#34;930&#34; y2=&#34;130&#34; stroke=&#34;#B4B8AC&#34; stroke-width=&#34;2&#34;/&gt;
+-        &lt;circle cx=&#34;150&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2.5&#34;/&gt;
+-        &lt;text x=&#34;150&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;커밋 A&lt;/text&gt;
+-        &lt;text x=&#34;150&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;headSha = a1b2c3&lt;/text&gt;
+-        &lt;circle cx=&#34;400&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#2F6B4F&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;2.5&#34;/&gt;
+-        &lt;text x=&#34;400&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#2F6B4F&#34; text-anchor=&#34;middle&#34;&gt;인증 발급&lt;/text&gt;
+-        &lt;text x=&#34;400&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;attestation.headSha = a1b2c3&lt;/text&gt;
+-        &lt;text x=&#34;400&#34; y=&#34;187&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#2F6B4F&#34; text-anchor=&#34;middle&#34;&gt;검사 초록 · 머지 가능&lt;/text&gt;
+-        &lt;circle cx=&#34;650&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2.5&#34;/&gt;
+-        &lt;text x=&#34;650&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;커밋 B 푸시&lt;/text&gt;
+-        &lt;text x=&#34;650&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;headSha = d4e5f6&lt;/text&gt;
+-        &lt;circle cx=&#34;880&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#A32A22&#34; stroke=&#34;#A32A22&#34; stroke-width=&#34;2.5&#34;/&gt;
+-        &lt;text x=&#34;880&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;15&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;인증 자동 무효&lt;/text&gt;
+-        &lt;text x=&#34;880&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11.5&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;a1b2c3 ≠ d4e5f6&lt;/text&gt;
+-        &lt;text x=&#34;880&#34; y=&#34;187&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;검사 빨강 · 재면담 필요&lt;/text&gt;
+-        &lt;rect x=&#34;150&#34; y=&#34;216&#34; width=&#34;730&#34; height=&#34;30&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
+-        &lt;text x=&#34;515&#34; y=&#34;236&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;13&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;인증은 사람이 아니라 특정 커밋에 대한 진술입니다. 코드가 바뀌면 진술도 무효입니다.&lt;/text&gt;
++
++        &lt;circle cx=&#34;140&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2.5&#34;/&gt;
++        &lt;text x=&#34;140&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;커밋 A&lt;/text&gt;
++        &lt;text x=&#34;140&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;head = a1b2c3&lt;/text&gt;
++
++        &lt;circle cx=&#34;340&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#2F6B4F&#34; stroke=&#34;#2F6B4F&#34; stroke-width=&#34;2.5&#34;/&gt;
++        &lt;text x=&#34;340&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#2F6B4F&#34; text-anchor=&#34;middle&#34;&gt;성공 확인 기록 발급&lt;/text&gt;
++        &lt;text x=&#34;340&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;record.head = a1b2c3&lt;/text&gt;
++        &lt;text x=&#34;340&#34; y=&#34;184&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#2F6B4F&#34; text-anchor=&#34;middle&#34;&gt;현재 적용성: A에 대해 게이트 success&lt;/text&gt;
++
++        &lt;circle cx=&#34;560&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#FFFFFF&#34; stroke=&#34;#15181A&#34; stroke-width=&#34;2.5&#34;/&gt;
++        &lt;text x=&#34;560&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;커밋 B 푸시&lt;/text&gt;
++        &lt;text x=&#34;560&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Mono, monospace&#34; font-size=&#34;11&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;head = d4e5f6&lt;/text&gt;
++
++        &lt;circle cx=&#34;740&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#8A6A12&#34; stroke=&#34;#8A6A12&#34; stroke-width=&#34;2.5&#34;/&gt;
++        &lt;text x=&#34;740&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#8A6A12&#34; text-anchor=&#34;middle&#34;&gt;A 기록은 이력&lt;/text&gt;
++        &lt;text x=&#34;740&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#8A6A12&#34; text-anchor=&#34;middle&#34;&gt;보존 · 조회 가능&lt;/text&gt;
++        &lt;text x=&#34;740&#34; y=&#34;184&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#8A6A12&#34; text-anchor=&#34;middle&#34;&gt;현재 적용성 없음&lt;/text&gt;
++
++        &lt;circle cx=&#34;890&#34; cy=&#34;130&#34; r=&#34;13&#34; fill=&#34;#A32A22&#34; stroke=&#34;#A32A22&#34; stroke-width=&#34;2.5&#34;/&gt;
++        &lt;text x=&#34;890&#34; y=&#34;96&#34; font-family=&#34;Oswald, sans-serif&#34; font-size=&#34;14&#34; font-weight=&#34;600&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;B는 재세션&lt;/text&gt;
++        &lt;text x=&#34;890&#34; y=&#34;168&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#A32A22&#34; text-anchor=&#34;middle&#34;&gt;2단계부터 다시 시작&lt;/text&gt;
++
++        &lt;rect x=&#34;140&#34; y=&#34;216&#34; width=&#34;750&#34; height=&#34;34&#34; fill=&#34;#EBECE5&#34; stroke=&#34;#B4B8AC&#34;/&gt;
++        &lt;text x=&#34;515&#34; y=&#34;238&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34;&gt;
++          성공 확인 기록은 보존됩니다. 이전 기록으로 &lt;tspan font-weight=&#34;600&#34;&gt;새 SHA를 통과&lt;/tspan&gt;시킬 수는 없습니다.
++        &lt;/text&gt;
++
++        &lt;rect x=&#34;140&#34; y=&#34;258&#34; width=&#34;750&#34; height=&#34;46&#34; fill=&#34;#F6F1E4&#34; stroke=&#34;#8A6A12&#34;/&gt;
++        &lt;text x=&#34;515&#34; y=&#34;278&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;12.5&#34; fill=&#34;#15181A&#34; text-anchor=&#34;middle&#34; font-weight=&#34;600&#34;&gt;
++          검토 head ↔ 머지 결과 SHA 매핑
++        &lt;/text&gt;
++        &lt;text x=&#34;515&#34; y=&#34;296&#34; font-family=&#34;IBM Plex Sans KR, sans-serif&#34; font-size=&#34;11.5&#34; fill=&#34;#4C5256&#34; text-anchor=&#34;middle&#34;&gt;
++          squash/rebase로 &lt;tspan font-family=&#34;IBM Plex Mono, monospace&#34;&gt;record.head&lt;/tspan&gt;와 &lt;tspan font-family=&#34;IBM Plex Mono, monospace&#34;&gt;merge_commit_sha&lt;/tspan&gt;가 다를 수 있음 · Bot이 매핑을 남기고 같은 값으로 취급하지 않음
++        &lt;/text&gt;
+       &lt;/svg&gt;
+-      &lt;figcaption&gt;&lt;b&gt;구현&lt;/b&gt; · Action에서 &lt;span style=&#34;font-family:&#39;IBM Plex Mono&#39;,monospace&#34;&gt;att.headSha !== headSha&lt;/span&gt;면 실패로 보고합니다.
+-      이 한 줄이 인증을 재사용 불가능하게 만듭니다.&lt;/figcaption&gt;
++      &lt;figcaption&gt;&lt;b&gt;운영&lt;/b&gt; · 대시보드는 &lt;b&gt;고유한 머지 PR&lt;/b&gt;을 집계하고, 머지 시점의 검토 head에 유효했던 확인 기록과
++      연결합니다. App은 서버 소유의 신뢰된 기록을 근거로 상태를 발행하며, 사용자 댓글의 자기주장이나 수정 가능한 배지를
++      승인 근거로 삼지 않습니다. 이는 목표 런타임의 필수 신뢰 경계이며, App이 기록을 자동으로 서명해 주는 것은 아닙니다.&lt;/figcaption&gt;
+     &lt;/figure&gt;
+   &lt;/section&gt;
+ </pre>
+      </details>
+    </div>
+    <div class="q">
+      <header>
+        <span class="tag axis-code">consequence</span>
+        <span class="anchor mono"><a href="https://github.com/daeungo1/the-last-human/blob/9ee443101d76ae1f82bf12c5d817714f968832e8/docs/plan-v2.html#L328" target="_blank" rel="noopener">docs/plan-v2.html:L328</a></span>
+      </header>
+      <p>[dry-run] docs/plan-v2.html:L328의 변경이 어떤 상황에서 무슨 결과를 냅니까?</p>
+      <textarea data-anchor="docs/plan-v2.html:L328" placeholder="코드를 보고 답해 주세요"></textarea>
+      <details>
+        <summary>막혔을 때 — 해당 코드 펼치기</summary>
+        <pre>         승인은 기록되지만 이해는 기록되지 않습니다. 그래서 조직은 불안을 감수하고, 리뷰어는 AI가 쓴 문서를 정독하고,
+         오픈소스는 아예 에이전트 기여를 막고 있습니다.&lt;/p&gt;&lt;/div&gt;
+       &lt;div class=&#34;row&#34;&gt;&lt;span class=&#34;k&#34;&gt;해법&lt;/span&gt;
+-        &lt;p class=&#34;v&#34;&gt;머지 직전, 변경의 위험 지점에 대해 &lt;b&gt;머지하려는 사람에게 묻고&lt;/b&gt; 답하면 통과시키는 게이트.
+-        VS Code 확장이 면담을 진행하고, GitHub Action이 필수 검사로 강제하며,
+-        인증은 커밋 SHA에 묶여 기록으로 남습니다.&lt;/p&gt;&lt;/div&gt;
++        &lt;p class=&#34;v&#34;&gt;머지 직전, 변경의 위험 지점에 대해 &lt;b&gt;작성자 또는 허용된 담당자에게 묻고&lt;/b&gt; 설명을 확인하는 게이트.
++        GitHub App 신원의 &lt;b&gt;Bot 서비스&lt;/b&gt;가 웹 면담을 열고 LLM 보조로 판정하며, PR 코멘트와 게이트 상태를
++        &lt;b&gt;단일 쓰기 주체&lt;/b&gt;로 남깁니다. Actions는 이벤트를 전달할 뿐 게이트를 쓰지 않습니다.
++        성공 확인 기록은 커밋 SHA와 질문 버전에 묶여 남습니다.&lt;/p&gt;&lt;/div&gt;
+       &lt;div class=&#34;row&#34;&gt;&lt;span class=&#34;k&#34;&gt;차별점&lt;/span&gt;
+-        &lt;p class=&#34;v&#34;&gt;모든 AI 리뷰 도구는 사람에게 설명을 &lt;b&gt;전달&lt;/b&gt;합니다.
+-        The Last Human은 사람에게 설명을 &lt;b&gt;요구&lt;/b&gt;합니다.
+-        대상은 코드가 아니라 사람, 시점은 생성 중이 아니라 머지 직전, 단위는 개인 학습이 아니라 조직 기록입니다.&lt;/p&gt;&lt;/div&gt;
++        &lt;p class=&#34;v&#34;&gt;사람이 코드를 &lt;b&gt;읽고 근거를 남긴 흔적&lt;/b&gt;이 머지 조건이 됩니다.
++        완전한 이해나 코드 안전의 증명은 아니며, 남은 것은 이 SHA에서 어떤 질문에 어떻게 답했는지의 기록입니다.
++        대상은 코드가 아니라 사람의 진술, 시점은 생성 중이 아니라 머지 직전, 단위는 개인 학습이 아니라 조직 기록입니다.&lt;/p&gt;&lt;/div&gt;
+       &lt;div class=&#34;row&#34;&gt;&lt;span class=&#34;k&#34;&gt;가치&lt;/span&gt;
+         &lt;p class=&#34;v&#34;&gt;재작업과 리뷰 시간 감소, 그리고 가장 큰 것 — &lt;b&gt;판별할 수 있으면 받아들일 수 있습니다.&lt;/b&gt;
+         막을 명분밖에 없던 조직에 받을 명분을 주는, 에이전트 채택 촉진 장치입니다.&lt;/p&gt;&lt;/div&gt;
+       &lt;div class=&#34;row&#34;&gt;&lt;span class=&#34;k&#34;&gt;범위&lt;/span&gt;
+-        &lt;p class=&#34;v&#34;&gt;2주 개발. 컴포넌트 3개(공유 core, VS Code 확장, GitHub Action)와
+-        시연 저장소 PR 4개. 9월 18일 제출.&lt;/p&gt;&lt;/div&gt;
++        &lt;p class=&#34;v&#34;&gt;2주 개발. Bot 서비스(GitHub App · 웹 면담 · LLM 보조 판정 · 게이트/코멘트 쓰기),
++        Actions 이벤트 배선, 대시보드 갱신 경로, 시연 저장소 PR 4개. 9월 18일 제출.
++        Azure 배포는 로컬 동작 확보 뒤 이어집니다.&lt;/p&gt;&lt;/div&gt;
++    &lt;/div&gt;
++
++    &lt;div class=&#34;arch-update&#34;&gt;
++      &lt;span class=&#34;tag&#34;&gt;2026-09-08&lt;/span&gt;
++      &lt;div&gt;이 문서는 &lt;b&gt;제안된 목표 런타임&lt;/b&gt;을 반영합니다. 아직 완전히 구현된 상태가 아니며,
++      s10 시스템 구성, s11 런타임 흐름, s12 인증의 수명을 갱신했습니다.
++      s14 모듈 명세와 s17 일정의 옛 VS Code · TypeScript 워크스페이스 서술은 레거시 초안으로 표기합니다.
++      정책(위험 규칙 · 프롬프트 · 판정 기준 · 인증 형식)은 &lt;b&gt;사람이 소유&lt;/b&gt;(AGENTS.md).&lt;/div&gt;
+     &lt;/div&gt;
+ 
+     &lt;nav class=&#34;toc&#34;&gt;</pre>
+      </details>
+    </div>
+
+    <div class="actions">
+      <button type="submit">답변 복사하고 PR 열기</button>
+      <span class="status" id="status"></span>
+    </div>
+  </form>
+
+  <footer>
+    복사된 블록을 PR 코멘트에 그대로 붙여넣으면 채점이 시작됩니다.
+    누가 답했는지는 GitHub이 코멘트 작성자로 인증합니다. 블록 자체는 서명되지 않습니다.
+  </footer>
+</main>
+
+<script>
+var PR_URL = "https://github.com/daeungo1/the-last-human/pull/5";
+var PAYLOAD = {
+  v: 1,
+  repo: "daeungo1/the-last-human",
+  pr: 5,
+  head_sha: "9ee443101d76ae1f82bf12c5d817714f968832e8"
+};
+var MARKER = "lasthuman:answers:v1";
+
+document.getElementById("f").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var status = document.getElementById("status");
+  var answers = Array.prototype.map.call(
+    document.querySelectorAll("textarea[data-anchor]"),
+    function (t) {
+      var anchor = t.dataset.anchor;
+      var picked = document.querySelector(
+        'input[type=radio][data-anchor="' + anchor.replace(/"/g, '\\"') + '"]:checked'
+      );
+      var a = { anchor: anchor, text: t.value.trim() };
+      if (picked) { a.choice = parseInt(picked.value, 10); }
+      return a;
+    }
+  );
+
+  var hasChoices = document.querySelector("input[type=radio][data-anchor]") !== null;
+  if (answers.some(function (a) { return !a.text; })) {
+    status.textContent = "근거를 한 줄씩 써 주세요. 모르겠다고 쓰셔도 됩니다.";
+    return;
+  }
+  if (hasChoices && answers.some(function (a) {
+    return document.querySelector('input[type=radio][data-anchor="' + a.anchor.replace(/"/g, '\\"') + '"]') && a.choice === undefined;
+  })) {
+    status.textContent = "객관식 문항의 보기를 골라 주세요.";
+    return;
+  }
+
+  var role = document.querySelector("input[name=role]:checked").value;
+  var payload = Object.assign({}, PAYLOAD, { role: role, answers: answers });
+  var block =
+    "<!-- " + MARKER + " " + JSON.stringify(payload) + " -->\n\n이해 인증 답변을 제출합니다.";
+
+  function fallback() {
+    status.textContent = "복사에 실패했습니다. 아래 상자에서 직접 복사하세요.";
+    var ta = document.createElement("textarea");
+    ta.value = block;
+    ta.style.width = "100%";
+    ta.style.minHeight = "8rem";
+    ta.style.marginTop = "1rem";
+    document.querySelector(".actions").after(ta);
+    ta.select();
+  }
+
+  if (!navigator.clipboard) { fallback(); return; }
+
+  navigator.clipboard.writeText(block).then(
+    function () {
+      status.textContent = "복사했습니다. PR 코멘트에 붙여넣으세요.";
+      window.open(PR_URL, "_blank", "noopener");
+    },
+    fallback
+  );
+});
+</script>
+</body>
+</html>
